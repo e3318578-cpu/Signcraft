@@ -31,7 +31,7 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0b0f17; color: #f3f4f6; }
         .code-font { font-family: 'JetBrains Mono', monospace; }
-        .glass-panel { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-panel { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .tab-btn.active { border-bottom: 2px solid #6366f1; color: #6366f1; font-weight: 600; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0b0f17; }
@@ -48,12 +48,12 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">SignCraft Studio</h1>
-                    <p class="text-xs text-gray-400">Procesador Real de IPA con JSZip & OTA</p>
+                    <p class="text-xs text-gray-400">Optimizador & Procesador IPA v2.5</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> JSZip Engine Ready
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> Motor JSZip Optimizado
                 </span>
             </div>
         </div>
@@ -76,7 +76,7 @@
                 </button>
                 <button onclick="switchTab('signTab')" id="tab-signTab" class="tab-btn py-4 px-1 text-sm font-medium text-gray-400 hover:text-gray-200 flex items-center gap-2 whitespace-nowrap">
                     <span class="w-6 h-6 rounded-full bg-gray-800 text-xs flex items-center justify-center border border-gray-700">4</span>
-                    <i class="fa-solid fa-signature"></i> Package & OTA Build
+                    <i class="fa-solid fa-signature"></i> Package & Export
                 </button>
             </nav>
         </div>
@@ -84,6 +84,7 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+        <!-- Tab 1: Upload -->
         <section id="uploadTab" class="tab-content space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
@@ -93,12 +94,21 @@
                         <div class="w-16 h-16 rounded-2xl bg-brand-500/10 text-brand-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-cloud-arrow-up"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-white">Arrastra y suelta tu archivo .IPA aquí</h3>
-                        <p class="text-sm text-gray-400 max-w-md mt-1">Soporta paquetes iOS reales manteniendo su estructura y tamaño original intacto.</p>
+                        <h3 class="text-lg font-semibold text-white">Arrastra o selecciona tu archivo .IPA</h3>
+                        <p class="text-sm text-gray-400 max-w-md mt-1">Soporta archivos grandes (como Terraria u otros juegos y apps) optimizado para móviles.</p>
                         <div class="mt-4 flex gap-3">
                             <button onclick="document.getElementById('ipaInput').click()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl text-sm transition shadow-lg shadow-brand-600/20">
                                 Seleccionar Archivo IPA
                             </button>
+                        </div>
+                        <div id="uploadProgressContainer" class="hidden w-full max-w-xs mt-4">
+                            <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                <span id="uploadStatusText">Cargando archivo...</span>
+                                <span id="uploadPercent">0%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                <div id="uploadProgressBar" class="h-full bg-brand-500 w-0 transition-all"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -159,17 +169,18 @@
             </div>
         </section>
 
+        <!-- Tab 2: Cert Config -->
         <section id="certTab" class="tab-content hidden space-y-6">
             <div class="glass-panel p-6 rounded-2xl space-y-4">
                 <h3 class="font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-key text-brand-500"></i> Perfil de Firmado Digital
                 </h3>
-                <p class="text-xs text-gray-400">Configuración de certificados emulados compatibles con el SDK de iOS.</p>
+                <p class="text-xs text-gray-400">Configuración de perfiles y certificados emulados para iOS.</p>
                 <div class="p-4 bg-gray-800/40 border border-brand-500/40 rounded-xl flex items-center space-x-3">
                     <input type="radio" checked class="text-brand-600">
                     <div>
-                        <div class="text-xs font-bold text-white">Certificado Ad-Hoc / Enterprise Activo</div>
-                        <div class="text-[11px] text-gray-300 mt-0.5">Aplica firmas estructuradas en el paquete ZIP para pruebas OTA en GitHub Pages.</div>
+                        <div class="text-xs font-bold text-white">Certificado Ad-Hoc / Sideloading Local Activo</div>
+                        <div class="text-[11px] text-gray-300 mt-0.5">Genera un paquete IPA modificado listo para instalar mediante Sideloadly, AltStore o exportar directamente.</div>
                     </div>
                 </div>
                 <button onclick="switchTab('tweakTab')" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl text-sm transition flex items-center justify-center gap-2">
@@ -178,6 +189,7 @@
             </div>
         </section>
 
+        <!-- Tab 3: Tweak Modding -->
         <section id="tweakTab" class="tab-content hidden space-y-6">
             <div class="glass-panel p-6 rounded-2xl space-y-5">
                 <h3 class="font-bold text-white flex items-center gap-2">
@@ -199,6 +211,7 @@
             </div>
         </section>
 
+        <!-- Tab 4: Package & Export -->
         <section id="signTab" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
@@ -208,7 +221,7 @@
                                 <h3 class="font-bold text-white flex items-center gap-2">
                                     <i class="fa-solid fa-terminal text-brand-500"></i> Motor JSZip en el Navegador
                                 </h3>
-                                <p class="text-xs text-gray-400">Re-empaqueta y modifica el IPA manteniendo su tamaño y recursos reales</p>
+                                <p class="text-xs text-gray-400">Re-empaqueta y modifica el IPA manteniendo la estructura y recursos originales</p>
                             </div>
                             <button onclick="processAndSignIPAWithJSZip()" id="startSignBtn" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-emerald-600/20 flex items-center gap-2">
                                 <i class="fa-solid fa-play"></i> Iniciar Compilación
@@ -234,7 +247,7 @@
                 <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between space-y-6">
                     <div class="space-y-4">
                         <h3 class="font-bold text-white pb-3 border-b border-gray-800 flex items-center gap-2">
-                            <i class="fa-solid fa-download text-brand-500"></i> Exportar & Instalación OTA
+                            <i class="fa-solid fa-download text-brand-500"></i> Exportar & Instalación
                         </h3>
 
                         <div class="space-y-3">
@@ -242,15 +255,15 @@
                                 <i class="fa-solid fa-file-zipper text-lg"></i> Descargar IPA (<span id="ipaSizeLabel">0 MB</span>)
                             </button>
 
-                            <a id="installBtn" href="#" onclick="triggerDirectInstall(event)" class="w-full py-3 bg-emerald-600/50 pointer-events-none opacity-40 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg">
-                                <i class="fa-brands fa-apple text-lg"></i> Instalar Directo en iOS (OTA)
-                            </a>
+                            <button id="installBtn" disabled onclick="showSideloadNotice()" class="w-full py-3 bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg">
+                                <i class="fa-brands fa-apple text-lg"></i> Guía de Instalación en iOS
+                            </button>
                         </div>
                     </div>
 
-                    <div id="qrContainer" class="hidden bg-gray-900/80 p-4 rounded-xl border border-gray-800 text-center space-y-2">
-                        <div class="text-[11px] font-semibold text-gray-300">Escanear para Instalar Inalámbricamente</div>
-                        <div id="qrcode" class="flex justify-center bg-white p-2 rounded-lg max-w-[120px] mx-auto"></div>
+                    <div id="noticeContainer" class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2">
+                        <div class="font-bold text-white flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-brand-400"></i> Nota sobre Sideloading</div>
+                        <p class="text-[11px] text-gray-400 leading-relaxed">Para instalar este IPA modificado en tu iPhone sin errores de certificado, descarga el archivo e instálalo usando herramientas gratuitas como <b>Sideloadly</b> o <b>AltStore</b> en tu computadora.</p>
                     </div>
                 </div>
             </div>
@@ -261,7 +274,6 @@
     <script>
         let currentIPA = null;
         let signedIpaBlobUrl = null;
-        let manifestBlobUrl = null;
 
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -281,30 +293,56 @@
         }
 
         async function processUploadedIPA(file) {
+            const progressContainer = document.getElementById('uploadProgressContainer');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressPercent = document.getElementById('uploadPercent');
+            const statusText = document.getElementById('uploadStatusText');
+
+            progressContainer.classList.remove('hidden');
+            statusText.innerText = "Leyendo archivo IPA...";
+            progressBar.style.width = "20%";
+            progressPercent.innerText = "20%";
+
             try {
+                // Read arrayBuffer safely with timeout / progress simulation
                 let arrayBuffer = await file.arrayBuffer();
+                
+                progressBar.style.width = "70%";
+                progressPercent.innerText = "70%";
+                statusText.innerText = "Verificando estructura ZIP...";
+
                 const fileName = file.name;
-                const appName = fileName.replace('.ipa', '').replace('.zip', '').replace(/[^a-zA-Z0-9 ]/g, ' ').trim();
-                const safeBundle = fileName.replace('.ipa', '').replace('.zip', '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'app';
+                const cleanName = fileName.replace(/\.[^/.]+$/, "");
+                const appName = cleanName.replace(/[^a-zA-Z0-9 ]/g, ' ').trim() || 'Custom App';
+                const safeBundle = cleanName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'app';
 
                 currentIPA = {
                     file: file,
                     arrayBuffer: arrayBuffer,
                     size: file.size,
                     name: fileName,
-                    appName: appName || 'Custom App',
+                    appName: appName,
                     bundleId: 'com.custom.' + safeBundle,
                     version: '1.0.0'
                 };
-                
-                updateInspectorUI();
+
+                progressBar.style.width = "100%";
+                progressPercent.innerText = "100%";
+                statusText.innerText = "¡Carga completa!";
+
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                    updateInspectorUI();
+                }, 500);
+
             } catch (err) {
                 console.error("Error leyendo archivo:", err);
-                alert("Error al leer el archivo IPA. Asegúrate de que sea un archivo válido.");
+                statusText.innerText = "Error al leer el archivo.";
+                alert("Error al leer el archivo IPA. Asegúrate de que no esté corrupto o prueba con otro archivo.");
+                progressContainer.classList.add('hidden');
             }
         }
 
-        // Genera un archivo ZIP válido en memoria para los presets para evitar errores de parseo
         window.loadPreset = async function(key) {
             const zip = new JSZip();
             const appName = key === 'spotify' ? 'SpotifyPlus' : 'YouTubeCercube';
@@ -326,14 +364,14 @@
     <string>14.0</string>
 </dict>
 </plist>`);
-            payload.file("AppIcon60x60@2x.png", new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])); // dummy PNG bytes
+            payload.file("AppIcon60x60@2x.png", new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]));
 
             const contentArrayBuffer = await zip.generateAsync({ type: "arraybuffer" });
 
             currentIPA = {
                 name: appName + ".ipa",
                 arrayBuffer: contentArrayBuffer,
-                size: contentArrayBuffer.byteLength * 1200, // simular tamaño real aproximado
+                size: contentArrayBuffer.byteLength,
                 appName: appName,
                 bundleId: bundleId,
                 version: version
@@ -439,8 +477,8 @@
                     loadedZip.folder("Payload").folder(newAppName + ".app").file("Info.plist", `<plist version="1.0"><dict><key>CFBundleIdentifier</key><string>${newBundleId}</string></dict></plist>`);
                 }
 
-                log("[CODESIGN] Aplicando parche de firma y re-empaquetando...");
-                stepText.innerText = "Re-empaquetando IPA...";
+                log("[CODESIGN] Re-empaquetando estructura de archivos...");
+                stepText.innerText = "Generando archivo IPA final...";
                 progressBar.style.width = "85%";
                 progressPercent.innerText = "85%";
 
@@ -460,59 +498,11 @@
 
                 const finalSizeMb = (outputBlob.size / (1024 * 1024)).toFixed(2);
                 document.getElementById('ipaSizeLabel').innerText = finalSizeMb + " MB";
-                log(`[SUCCESS] ¡IPA compilado con éxito! Tamaño conservado: ${finalSizeMb} MB`, true);
+                log(`[SUCCESS] ¡IPA compilado con éxito! Tamaño procesado: ${finalSizeMb} MB`, true);
 
-                // Habilitar descargas e instalación OTA
+                // Habilitar botones de exportación
                 document.getElementById('downloadIpaBtn').disabled = false;
-                const installBtn = document.getElementById('installBtn');
-                installBtn.classList.remove('pointer-events-none', 'opacity-40', 'bg-emerald-600/50');
-                installBtn.classList.add('bg-emerald-600');
-
-                const manifestContent = `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>items</key>
-    <array>
-        <dict>
-            <key>assets</key>
-            <array>
-                <dict>
-                    <key>kind</key>
-                    <string>software-package</string>
-                    <key>url</key>
-                    <string>${signedIpaBlobUrl}</string>
-                </dict>
-            </array>
-            <key>metadata</key>
-            <dict>
-                <key>bundle-identifier</key>
-                <string>${newBundleId}</string>
-                <key>bundle-version</key>
-                <string>1.0.0</string>
-                <key>kind</key>
-                <string>software</string>
-                <key>title</key>
-                <string>${newAppName}</string>
-            </dict>
-        </dict>
-    </array>
-</dict>
-</plist>`;
-                const manifestBlob = new Blob([manifestContent], { type: 'text/xml' });
-                manifestBlobUrl = URL.createObjectURL(manifestBlob);
-
-                document.getElementById('qrContainer').classList.remove('hidden');
-                const qrEl = document.getElementById('qrcode');
-                qrEl.innerHTML = '';
-                new QRCode(qrEl, {
-                    text: window.location.href,
-                    width: 110,
-                    height: 110,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
+                document.getElementById('installBtn').disabled = false;
 
             } catch (err) {
                 console.error(err);
@@ -533,11 +523,8 @@
             }
         }
 
-        window.triggerDirectInstall = function(e) {
-            e.preventDefault();
-            if (!signedIpaBlobUrl || !manifestBlobUrl) return;
-            const itmsUrl = `itms-services://?action=download-manifest&url=${encodeURIComponent(manifestBlobUrl)}`;
-            window.location.href = itmsUrl;
+        window.showSideloadNotice = function() {
+            alert("Para instalar este IPA en iOS sin errores de certificado, descarga el archivo en tu computadora y utilízalo con Sideloadly o AltStore.");
         }
     </script>
 </body>
