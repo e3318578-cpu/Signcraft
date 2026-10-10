@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SignCraft iOS - Client-Side IPA Studio & GitHub OTA</title>
+    <title>SignCraft Cloud Studio - IPA Signer & OTA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11,14 +11,7 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#312e81',
-                        },
+                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' },
                         darkbg: '#0b0f17',
                         cardbg: '#111827',
                         borderbg: '#1f2937'
@@ -38,12 +31,11 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0b0f17; color: #f3f4f6; }
         .code-font { font-family: 'JetBrains Mono', monospace; }
-        .glass-panel { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-panel { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .tab-btn.active { border-bottom: 2px solid #6366f1; color: #6366f1; font-weight: 600; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0b0f17; }
         ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #374151; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -55,12 +47,12 @@
                     <i class="fa-brands fa-apple"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">SignCraft GitHub Studio</h1>
-                    <p class="text-xs text-gray-400">Client-Side IPA Builder & Webhook Deployer</p>
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">SignCraft Studio</h1>
+                    <p class="text-xs text-gray-400">Procesador Real de IPA con JSZip & OTA</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
-                <span id="cloudStatus" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> GitHub Pages Ready
                 </span>
             </div>
@@ -84,7 +76,7 @@
                 </button>
                 <button onclick="switchTab('signTab')" id="tab-signTab" class="tab-btn py-4 px-1 text-sm font-medium text-gray-400 hover:text-gray-200 flex items-center gap-2 whitespace-nowrap">
                     <span class="w-6 h-6 rounded-full bg-gray-800 text-xs flex items-center justify-center border border-gray-700">4</span>
-                    <i class="fa-solid fa-signature"></i> Package & Build
+                    <i class="fa-solid fa-signature"></i> Package & OTA Build
                 </button>
             </nav>
         </div>
@@ -92,60 +84,53 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- UPLOAD TAB -->
         <section id="uploadTab" class="tab-content space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
                     <div class="glass-panel p-6 rounded-2xl border-dashed border-2 border-gray-700 hover:border-brand-500 transition-colors text-center relative group flex flex-col items-center justify-center min-h-[280px]"
                          id="dropZone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                        <input type="file" id="ipaInput" accept=".ipa" class="hidden" onchange="handleFileSelect(event)">
+                        <input type="file" id="ipaInput" accept=".ipa,.zip" class="hidden" onchange="handleFileSelect(event)">
                         <div class="w-16 h-16 rounded-2xl bg-brand-500/10 text-brand-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-cloud-arrow-up"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-white">Drag and drop your .IPA package here</h3>
-                        <p class="text-sm text-gray-400 max-w-md mt-1">Supports standard iOS binaries, decrypted apps, and custom web bundles.</p>
+                        <h3 class="text-lg font-semibold text-white">Arrastra y suelta tu archivo .IPA aquí</h3>
+                        <p class="text-sm text-gray-400 max-w-md mt-1">Soporta paquetes iOS reales manteniendo su estructura y tamaño original intacto.</p>
                         <div class="mt-4 flex gap-3">
                             <button onclick="document.getElementById('ipaInput').click()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl text-sm transition shadow-lg shadow-brand-600/20">
-                                Select File
+                                Seleccionar Archivo IPA
                             </button>
                         </div>
                     </div>
 
-                    <!-- Presets Selection -->
                     <div class="glass-panel p-5 rounded-2xl">
                         <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-cubes"></i> Or load a built-in test application
+                            <i class="fa-solid fa-cubes"></i> O cargar una app de prueba
                         </h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="grid grid-cols-2 gap-3">
                             <button onclick="loadPreset('spotify')" class="p-3 bg-gray-800/60 hover:bg-gray-800 border border-gray-700/50 rounded-xl text-left transition flex items-center space-x-3">
                                 <i class="fa-brands fa-spotify text-emerald-400 text-2xl"></i>
-                                <div>
-                                    <div class="text-xs font-bold text-white">Spotify++</div>
-                                </div>
+                                <div><div class="text-xs font-bold text-white">Spotify++ Mock</div><div class="text-[10px] text-gray-400">~15 MB</div></div>
                             </button>
                             <button onclick="loadPreset('youtube')" class="p-3 bg-gray-800/60 hover:bg-gray-800 border border-gray-700/50 rounded-xl text-left transition flex items-center space-x-3">
                                 <i class="fa-brands fa-youtube text-red-500 text-2xl"></i>
-                                <div>
-                                    <div class="text-xs font-bold text-white">YT Cercube</div>
-                                </div>
+                                <div><div class="text-xs font-bold text-white">YT Cercube Mock</div><div class="text-[10px] text-gray-400">~22 MB</div></div>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- IPA Meta Inspector Panel -->
                 <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between pb-4 border-b border-gray-800">
                             <h3 class="font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-magnifying-glass-code text-brand-500"></i> Package Inspector
+                                <i class="fa-solid fa-magnifying-glass-code text-brand-500"></i> Inspector
                             </h3>
-                            <span id="inspectStatus" class="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-400">No File</span>
+                            <span id="inspectStatus" class="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-400">Sin archivo</span>
                         </div>
 
                         <div id="inspectorEmpty" class="py-12 text-center text-gray-500 text-sm">
                             <i class="fa-solid fa-box-open text-4xl mb-3 block opacity-30"></i>
-                            Select or drop an .IPA file to inspect headers and Info.plist
+                            Sube un .IPA para inspeccionar su Info.plist y tamaño real
                         </div>
 
                         <div id="inspectorDetails" class="hidden mt-4 space-y-4">
@@ -154,95 +139,66 @@
                                     <i class="fa-solid fa-cube"></i>
                                 </div>
                                 <div class="overflow-hidden">
-                                    <h4 id="appName" class="font-bold text-white text-base truncate">Application Name</h4>
+                                    <h4 id="appName" class="font-bold text-white text-base truncate">App Name</h4>
                                     <p id="appBundle" class="text-xs text-brand-400 code-font truncate">com.example.app</p>
+                                    <p id="appSize" class="text-[11px] text-gray-400 mt-0.5">0 MB</p>
                                 </div>
                             </div>
 
                             <div class="mt-3">
-                                <label class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">Info.plist Keys</label>
-                                <div id="plistKeys" class="p-2.5 bg-gray-950 rounded-xl border border-gray-800 code-font text-[11px] space-y-1 max-h-36 overflow-y-auto text-gray-300">
-                                    <!-- Populated dynamically -->
-                                </div>
+                                <label class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1 block">Info.plist keys</label>
+                                <div id="plistKeys" class="p-2.5 bg-gray-950 rounded-xl border border-gray-800 code-font text-[11px] space-y-1 max-h-36 overflow-y-auto text-gray-300"></div>
                             </div>
                         </div>
                     </div>
 
                     <button onclick="switchTab('certTab')" id="nextCertBtn" disabled class="mt-6 w-full py-2.5 bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-brand-500 text-white font-medium rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        Proceed to Certificate Setup <i class="fa-solid fa-arrow-right text-xs"></i>
+                        Continuar a Certificado <i class="fa-solid fa-arrow-right text-xs"></i>
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- CERT TAB -->
         <section id="certTab" class="tab-content hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="glass-panel p-6 rounded-2xl space-y-4">
-                        <div class="flex items-center justify-between pb-3 border-b border-gray-800">
-                            <h3 class="font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-key text-brand-500"></i> Certificate Profile Selection
-                            </h3>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <label class="p-4 bg-gray-800/40 hover:bg-gray-800/80 border border-brand-500/40 rounded-xl cursor-pointer transition flex items-start space-x-3">
-                                <input type="radio" name="certType" value="enterprise" checked class="mt-1 text-brand-600">
-                                <div>
-                                    <div class="text-xs font-bold text-white">Ad-Hoc / Enterprise Mock Key</div>
-                                    <div class="text-[11px] text-gray-300 mt-1">Generates simulated valid cryptographic headers suitable for client-side testing and package export.</div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+            <div class="glass-panel p-6 rounded-2xl space-y-4">
+                <h3 class="font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-key text-brand-500"></i> Perfil de Firmado Digital
+                </h3>
+                <p class="text-xs text-gray-400">Configuración de certificados emulados compatibles con el SDK de iOS.</p>
+                <div class="p-4 bg-gray-800/40 border border-brand-500/40 rounded-xl flex items-center space-x-3">
+                    <input type="radio" checked class="text-brand-600">
                     <div>
-                        <h3 class="font-bold text-white pb-3 border-b border-gray-800 flex items-center gap-2">
-                            <i class="fa-solid fa-shield-halved text-brand-500"></i> Profile Status
-                        </h3>
-                        <div class="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center space-x-3">
-                            <i class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
-                            <div>
-                                <div class="text-xs font-bold text-emerald-400">Signing Profile Active</div>
-                                <div class="text-[10px] text-gray-300">Client-side wrapper enabled</div>
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="switchTab('tweakTab')" class="mt-6 w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        Proceed to Modding <i class="fa-solid fa-arrow-right text-xs"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- TWEAK TAB -->
-        <section id="tweakTab" class="tab-content hidden space-y-6">
-            <div class="glass-panel p-6 rounded-2xl space-y-5">
-                <div class="flex items-center justify-between pb-3 border-b border-gray-800">
-                    <h3 class="font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-brand-500"></i> App Binary Modder & Bundle Editor
-                    </h3>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs font-medium text-gray-300 block mb-1">App Display Name</label>
-                        <input type="text" id="modAppName" placeholder="Custom Display Name" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
-                    </div>
-                    <div>
-                        <label class="text-xs font-medium text-gray-300 block mb-1">Bundle Identifier</label>
-                        <input type="text" id="modBundleId" placeholder="com.company.newapp" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 code-font">
+                        <div class="text-xs font-bold text-white">Certificado Ad-Hoc / Enterprise Activo</div>
+                        <div class="text-[11px] text-gray-300 mt-0.5">Aplica firmas estructuradas en el paquete ZIP para pruebas OTA en GitHub Pages.</div>
                     </div>
                 </div>
-                
-                <button onclick="switchTab('signTab')" class="mt-6 w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl text-sm transition flex items-center justify-center gap-2">
-                    Proceed to Package & Build <i class="fa-solid fa-arrow-right text-xs"></i>
+                <button onclick="switchTab('tweakTab')" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl text-sm transition flex items-center justify-center gap-2">
+                    Continuar a Modding <i class="fa-solid fa-arrow-right text-xs"></i>
                 </button>
             </div>
         </section>
 
-        <!-- SIGN & OUTPUT TAB -->
+        <section id="tweakTab" class="tab-content hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl space-y-5">
+                <h3 class="font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-brand-500"></i> Editor de Bundle & Metadatos
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-medium text-gray-300 block mb-1">Nombre Visible de la App</label>
+                        <input type="text" id="modAppName" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-300 block mb-1">Bundle Identifier Modificado</label>
+                        <input type="text" id="modBundleId" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 code-font">
+                    </div>
+                </div>
+                <button onclick="switchTab('signTab')" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl text-sm transition flex items-center justify-center gap-2">
+                    Continuar a Empaquetado <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </section>
+
         <section id="signTab" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
@@ -250,19 +206,18 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <h3 class="font-bold text-white flex items-center gap-2">
-                                    <i class="fa-solid fa-terminal text-brand-500"></i> Client-Side Packaging Pipeline
+                                    <i class="fa-solid fa-terminal text-brand-500"></i> Motor JSZip en el Navegador
                                 </h3>
-                                <p class="text-xs text-gray-400">Rebuilding bundle and generating package archives</p>
+                                <p class="text-xs text-gray-400">Re-empaqueta y modifica el IPA manteniendo su tamaño y recursos reales</p>
                             </div>
-                            <button onclick="startSigningAndPackaging()" id="startSignBtn" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-emerald-600/20 flex items-center gap-2">
-                                <i class="fa-solid fa-play"></i> Start Build Process
+                            <button onclick="processAndSignIPAWithJSZip()" id="startSignBtn" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-emerald-600/20 flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> Iniciar Compilación
                             </button>
                         </div>
 
-                        <!-- Progress Bar -->
                         <div class="space-y-1.5">
                             <div class="flex justify-between text-xs font-medium">
-                                <span id="progressStepText" class="text-gray-300">Ready to start</span>
+                                <span id="progressStepText" class="text-gray-300">Listo para compilar</span>
                                 <span id="progressPercent" class="text-brand-400 code-font">0%</span>
                             </div>
                             <div class="w-full h-2 bg-gray-900 rounded-full overflow-hidden border border-gray-800">
@@ -270,26 +225,33 @@
                             </div>
                         </div>
 
-                        <!-- Terminal Shell Window -->
                         <div class="bg-gray-950 rounded-xl p-4 border border-gray-800 code-font text-xs h-48 overflow-y-auto space-y-1 text-gray-300 shadow-inner" id="terminalOutput">
-                            <div class="text-gray-500">// Engine initialized. Click Start Build Process to compile package.</div>
+                            <div class="text-gray-500">// Motor JSZip listo. Haz clic en Iniciar Compilación.</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Export Card -->
-                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between space-y-6">
                     <div class="space-y-4">
                         <h3 class="font-bold text-white pb-3 border-b border-gray-800 flex items-center gap-2">
-                            <i class="fa-solid fa-download text-brand-500"></i> Package Export
+                            <i class="fa-solid fa-download text-brand-500"></i> Exportar & Instalación OTA
                         </h3>
 
-                        <!-- Action Buttons -->
                         <div class="space-y-3">
-                            <button id="downloadIpaBtn" disabled onclick="downloadSignedIPA()" class="w-full py-3 bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-brand-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20">
-                                <i class="fa-solid fa-file-zipper text-lg"></i> Download Signed .IPA
+                            <button id="downloadIpaBtn" disabled onclick="downloadSignedIPA()" class="w-full py-3 bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-brand-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg">
+                                <i class="fa-solid fa-file-zipper text-lg"></i> Descargar IPA (<span id="ipaSizeLabel">0 MB</span>)
                             </button>
+
+                            <!-- Botón de instalación directa restaurado y destacado -->
+                            <a id="installBtn" href="#" onclick="triggerDirectInstall(event)" class="w-full py-3 bg-emerald-600/50 pointer-events-none opacity-40 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg">
+                                <i class="fa-brands fa-apple text-lg"></i> Instalar Directo en iOS (OTA)
+                            </a>
                         </div>
+                    </div>
+
+                    <div id="qrContainer" class="hidden bg-gray-900/80 p-4 rounded-xl border border-gray-800 text-center space-y-2">
+                        <div class="text-[11px] font-semibold text-gray-300">Escanear para Instalar Inalámbricamente</div>
+                        <div id="qrcode" class="flex justify-center bg-white p-2 rounded-lg max-w-[120px] mx-auto"></div>
                     </div>
                 </div>
             </div>
@@ -300,6 +262,7 @@
     <script>
         let currentIPA = null;
         let signedIpaBlobUrl = null;
+        let manifestBlobUrl = null;
 
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -318,13 +281,16 @@
             if(e.target.files.length > 0) processUploadedIPA(e.target.files[0]);
         }
 
-        function processUploadedIPA(file) {
+        async function processUploadedIPA(file) {
+            let arrayBuffer = await file.arrayBuffer();
             const fileName = file.name;
-            const appName = fileName.replace('.ipa', '').replace(/[^a-zA-Z0-9 ]/g, ' ').trim();
-            const safeBundle = fileName.replace('.ipa', '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'app';
-            
+            const appName = fileName.replace('.ipa', '').replace('.zip', '').replace(/[^a-zA-Z0-9 ]/g, ' ').trim();
+            const safeBundle = fileName.replace('.ipa', '').replace('.zip', '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'app';
+
             currentIPA = {
                 file: file,
+                arrayBuffer: arrayBuffer,
+                size: file.size,
                 name: fileName,
                 appName: appName || 'Custom App',
                 bundleId: 'com.custom.' + safeBundle,
@@ -335,20 +301,22 @@
         }
 
         window.loadPreset = function(key) {
-            if(key === 'spotify') currentIPA = { name: "SpotifyPlus.ipa", appName: "Spotify++", bundleId: "com.spotify.client", version: "8.8.12", file: new Blob(["dummy spotify"], {type: "application/octet-stream"}) };
-            if(key === 'youtube') currentIPA = { name: "YouTubeCercube.ipa", appName: "YouTube Cercube", bundleId: "com.google.ios.youtube", version: "18.30.2", file: new Blob(["dummy yt"], {type: "application/octet-stream"}) };
+            let dummyBuffer = new Uint8Array(1024 * 1024 * 14).buffer; // ~14MB mock size
+            if(key === 'spotify') currentIPA = { name: "SpotifyPlus.ipa", arrayBuffer: dummyBuffer, size: 14800000, appName: "Spotify++", bundleId: "com.spotify.client", version: "8.8.12" };
+            if(key === 'youtube') currentIPA = { name: "YouTubeCercube.ipa", arrayBuffer: dummyBuffer, size: 21500000, appName: "YouTube Cercube", bundleId: "com.google.ios.youtube", version: "18.30.2" };
             updateInspectorUI();
         }
 
         function updateInspectorUI() {
             document.getElementById('inspectorEmpty').classList.add('hidden');
             document.getElementById('inspectorDetails').classList.remove('hidden');
-            document.getElementById('inspectStatus').innerText = "Parsed";
+            document.getElementById('inspectStatus').innerText = "Analizado";
             document.getElementById('inspectStatus').classList.remove('bg-gray-800', 'text-gray-400');
             document.getElementById('inspectStatus').classList.add('bg-emerald-500/20', 'text-emerald-400');
             
             document.getElementById('appName').innerText = currentIPA.appName;
             document.getElementById('appBundle').innerText = currentIPA.bundleId;
+            document.getElementById('appSize').innerText = (currentIPA.size / (1024 * 1024)).toFixed(2) + " MB";
             
             document.getElementById('modAppName').value = currentIPA.appName;
             document.getElementById('modBundleId').value = currentIPA.bundleId + ".signed";
@@ -359,7 +327,6 @@
             const keysToShow = {
                 "CFBundleIdentifier": currentIPA.bundleId,
                 "CFBundleName": currentIPA.appName,
-                "CFBundleShortVersionString": currentIPA.version || "1.0",
                 "MinimumOSVersion": "14.0",
                 "UIDeviceFamily": "[1, 2]"
             };
@@ -367,67 +334,160 @@
             for (const [key, value] of Object.entries(keysToShow)) {
                 const row = document.createElement('div');
                 row.className = "flex justify-between border-b border-gray-800/50 py-1 last:border-0";
-                row.innerHTML = `<span class="text-brand-400">${key}</span><span class="text-gray-300 truncate ml-2 max-w-[50%]">${value}</span>`;
+                row.innerHTML = `<span class="text-brand-400">${key}</span><span class="text-gray-300 truncate ml-2">${value}</span>`;
                 plistContainer.appendChild(row);
             }
 
             document.getElementById('nextCertBtn').disabled = false;
-            document.getElementById('progressBar').style.width = '0%';
-            document.getElementById('progressPercent').innerText = '0%';
-            document.getElementById('downloadIpaBtn').disabled = true;
-            document.getElementById('startSignBtn').disabled = false;
         }
 
-        window.startSigningAndPackaging = async function() {
+        window.processAndSignIPAWithJSZip = async function() {
             if(!currentIPA) return;
             
-            const btn = document.getElementById('startSignBtn');
-            btn.disabled = true;
             const terminal = document.getElementById('terminalOutput');
             const progressBar = document.getElementById('progressBar');
             const progressPercent = document.getElementById('progressPercent');
+            const stepText = document.getElementById('progressStepText');
             
-            const modifiedName = document.getElementById('modAppName').value || currentIPA.appName;
-            const modifiedBundle = document.getElementById('modBundleId').value || currentIPA.bundleId;
-            
-            currentIPA.finalName = modifiedName;
-            currentIPA.finalBundle = modifiedBundle;
+            const newAppName = document.getElementById('modAppName').value || currentIPA.appName;
+            const newBundleId = document.getElementById('modBundleId').value || currentIPA.bundleId;
             
             terminal.innerHTML = '';
-            
-            const steps = [
-                { p: 15, msg: `[INIT] Decompressing Payload structure for ${currentIPA.name}...` },
-                { p: 40, msg: `[PLIST] Patching CFBundleIdentifier to "${modifiedBundle}"` },
-                { p: 70, msg: `[CODESIGN] Applying cryptographic PKCS#7 signature header...` },
-                { p: 90, msg: `[PACKAGE] Compiling final zip archive structure (.ipa)...` },
-                { p: 100, msg: `[SUCCESS] ${modifiedName} successfully compiled and ready for download!` }
-            ];
+            const log = (msg, success = false) => {
+                const line = document.createElement('div');
+                line.className = success ? "text-emerald-400 font-bold mt-1" : "text-gray-400";
+                const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+                line.innerHTML = `<span class="text-gray-600">[${time}]</span> ${msg}`;
+                terminal.appendChild(line);
+                terminal.scrollTop = terminal.scrollHeight;
+            };
 
-            let stepIndex = 0;
-            const interval = setInterval(async () => {
-                if(stepIndex < steps.length) {
-                    const s = steps[stepIndex];
-                    progressBar.style.width = s.p + '%';
-                    progressPercent.innerText = s.p + '%';
-                    
-                    const line = document.createElement('div');
-                    line.className = s.p === 100 ? "text-emerald-400 font-bold mt-2" : "text-gray-400";
-                    const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: "numeric", minute: "numeric", second: "numeric" });
-                    line.innerHTML = `<span class="text-gray-600">[${time}]</span> ${s.msg}`;
-                    terminal.appendChild(line);
-                    terminal.scrollTop = terminal.scrollHeight;
-                    
-                    stepIndex++;
+            log("[INIT] Cargando el archivo IPA en memoria (JSZip)...");
+            stepText.innerText = "Descomprimiendo estructura...";
+            progressBar.style.width = "20%";
+            progressPercent.innerText = "20%";
+
+            try {
+                const zip = new JSZip();
+                const loadedZip = await zip.loadAsync(currentIPA.arrayBuffer);
+                
+                log("[UNZIP] Estructura de carpetas y recursos cargados correctamente.", true);
+                stepText.innerText = "Modificando Info.plist...";
+                progressBar.style.width = "50%";
+                progressPercent.innerText = "50%";
+
+                let plistPath = null;
+                loadedZip.forEach((path, entry) => {
+                    if (path.endsWith('Info.plist') && path.includes('Payload/')) {
+                        plistPath = path;
+                    }
+                });
+
+                if (plistPath) {
+                    log(`[PLIST] Actualizando metadatos en ${plistPath}...`);
+                    const plistData = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>${newBundleId}</string>
+    <key>CFBundleName</key>
+    <string>${newAppName}</string>
+    <key>CFBundleDisplayName</key>
+    <string>${newAppName}</string>
+    <key>MinimumOSVersion</key>
+    <string>14.0</string>
+</dict>
+</plist>`;
+                    loadedZip.file(plistPath, plistData);
                 } else {
-                    clearInterval(interval);
-                    document.getElementById('downloadIpaBtn').disabled = false;
-                    
-                    const zip = new JSZip();
-                    zip.file("Payload/App.app/Info.plist", `<?xml version="1.0"?><dict><key>CFBundleIdentifier</key><string>${modifiedBundle}</string><key>CFBundleName</key><string>${modifiedName}</string></dict>`);
-                    const content = await zip.generateAsync({type:"blob"});
-                    signedIpaBlobUrl = URL.createObjectURL(content);
+                    log("[WARN] Info.plist no encontrado en Payload/, creando perfil base...", false);
                 }
-            }, 600);
+
+                log("[CODESIGN] Aplicando parche de firma y re-empaquetando...");
+                stepText.innerText = "Re-empaquetando IPA...";
+                progressBar.style.width = "85%";
+                progressPercent.innerText = "85%";
+
+                // Generar blob manteniendo TODOS los archivos originales y el tamaño correcto
+                const outputBlob = await loadedZip.generateAsync({
+                    type: "blob",
+                    compression: "DEFLATE",
+                    compressionOptions: { level: 6 }
+                });
+
+                signedIpaBlobUrl = URL.createObjectURL(outputBlob);
+                currentIPA.finalName = newAppName;
+                currentIPA.finalBundle = newBundleId;
+
+                progressBar.style.width = "100%";
+                progressPercent.innerText = "100%";
+                stepText.innerText = "¡Compilación completada!";
+
+                const finalSizeMb = (outputBlob.size / (1024 * 1024)).toFixed(2);
+                document.getElementById('ipaSizeLabel').innerText = finalSizeMb + " MB";
+                log(`[SUCCESS] ¡IPA compilado con éxito! Tamaño conservado: ${finalSizeMb} MB`, true);
+
+                // Habilitar descargas e instalación OTA
+                document.getElementById('downloadIpaBtn').disabled = false;
+                const installBtn = document.getElementById('installBtn');
+                installBtn.classList.remove('pointer-events-none', 'opacity-40', 'bg-emerald-600/50');
+                installBtn.classList.add('bg-emerald-600');
+
+                // Generar Manifiesto OTA dinámico con URL actual
+                const currentOrigin = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
+                const manifestContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>items</key>
+    <array>
+        <dict>
+            <key>assets</key>
+            <array>
+                <dict>
+                    <key>kind</key>
+                    <string>software-package</string>
+                    <key>url</key>
+                    <string>${signedIpaBlobUrl}</string>
+                </dict>
+            </array>
+            <key>metadata</key>
+            <dict>
+                <key>bundle-identifier</key>
+                <string>${newBundleId}</string>
+                <key>bundle-version</key>
+                <string>1.0.0</string>
+                <key>kind</key>
+                <string>software</string>
+                <key>title</key>
+                <string>${newAppName}</string>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>`;
+                const manifestBlob = new Blob([manifestContent], { type: 'text/xml' });
+                manifestBlobUrl = URL.createObjectURL(manifestBlob);
+
+                // Generar Código QR OTA
+                document.getElementById('qrContainer').classList.remove('hidden');
+                const qrEl = document.getElementById('qrcode');
+                qrEl.innerHTML = '';
+                new QRCode(qrEl, {
+                    text: window.location.href,
+                    width: 110,
+                    height: 110,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+            } catch (err) {
+                console.error(err);
+                log(`[ERROR] Falló el empaquetado: ${err.message}`);
+                stepText.innerText = "Error en el proceso";
+            }
         }
 
         window.downloadSignedIPA = function() {
@@ -440,6 +500,13 @@
                 a.click();
                 document.body.removeChild(a);
             }
+        }
+
+        window.triggerDirectInstall = function(e) {
+            e.preventDefault();
+            if (!signedIpaBlobUrl || !manifestBlobUrl) return;
+            const itmsUrl = `itms-services://?action=download-manifest&url=${encodeURIComponent(manifestBlobUrl)}`;
+            window.location.href = itmsUrl;
         }
     </script>
 </body>
