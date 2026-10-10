@@ -53,7 +53,7 @@
             </div>
             <div class="flex items-center space-x-4">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> GitHub Pages Ready
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> JSZip Engine Ready
                 </span>
             </div>
         </div>
@@ -109,11 +109,11 @@
                         <div class="grid grid-cols-2 gap-3">
                             <button onclick="loadPreset('spotify')" class="p-3 bg-gray-800/60 hover:bg-gray-800 border border-gray-700/50 rounded-xl text-left transition flex items-center space-x-3">
                                 <i class="fa-brands fa-spotify text-emerald-400 text-2xl"></i>
-                                <div><div class="text-xs font-bold text-white">Spotify++ Mock</div><div class="text-[10px] text-gray-400">~15 MB</div></div>
+                                <div><div class="text-xs font-bold text-white">Spotify++ Mock</div><div class="text-[10px] text-gray-400">Genera IPA Válido</div></div>
                             </button>
                             <button onclick="loadPreset('youtube')" class="p-3 bg-gray-800/60 hover:bg-gray-800 border border-gray-700/50 rounded-xl text-left transition flex items-center space-x-3">
                                 <i class="fa-brands fa-youtube text-red-500 text-2xl"></i>
-                                <div><div class="text-xs font-bold text-white">YT Cercube Mock</div><div class="text-[10px] text-gray-400">~22 MB</div></div>
+                                <div><div class="text-xs font-bold text-white">YT Cercube Mock</div><div class="text-[10px] text-gray-400">Genera IPA Válido</div></div>
                             </button>
                         </div>
                     </div>
@@ -242,7 +242,6 @@
                                 <i class="fa-solid fa-file-zipper text-lg"></i> Descargar IPA (<span id="ipaSizeLabel">0 MB</span>)
                             </button>
 
-                            <!-- Botón de instalación directa restaurado y destacado -->
                             <a id="installBtn" href="#" onclick="triggerDirectInstall(event)" class="w-full py-3 bg-emerald-600/50 pointer-events-none opacity-40 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg">
                                 <i class="fa-brands fa-apple text-lg"></i> Instalar Directo en iOS (OTA)
                             </a>
@@ -282,28 +281,63 @@
         }
 
         async function processUploadedIPA(file) {
-            let arrayBuffer = await file.arrayBuffer();
-            const fileName = file.name;
-            const appName = fileName.replace('.ipa', '').replace('.zip', '').replace(/[^a-zA-Z0-9 ]/g, ' ').trim();
-            const safeBundle = fileName.replace('.ipa', '').replace('.zip', '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'app';
+            try {
+                let arrayBuffer = await file.arrayBuffer();
+                const fileName = file.name;
+                const appName = fileName.replace('.ipa', '').replace('.zip', '').replace(/[^a-zA-Z0-9 ]/g, ' ').trim();
+                const safeBundle = fileName.replace('.ipa', '').replace('.zip', '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'app';
 
-            currentIPA = {
-                file: file,
-                arrayBuffer: arrayBuffer,
-                size: file.size,
-                name: fileName,
-                appName: appName || 'Custom App',
-                bundleId: 'com.custom.' + safeBundle,
-                version: '1.0.0'
-            };
-            
-            updateInspectorUI();
+                currentIPA = {
+                    file: file,
+                    arrayBuffer: arrayBuffer,
+                    size: file.size,
+                    name: fileName,
+                    appName: appName || 'Custom App',
+                    bundleId: 'com.custom.' + safeBundle,
+                    version: '1.0.0'
+                };
+                
+                updateInspectorUI();
+            } catch (err) {
+                console.error("Error leyendo archivo:", err);
+                alert("Error al leer el archivo IPA. Asegúrate de que sea un archivo válido.");
+            }
         }
 
-        window.loadPreset = function(key) {
-            let dummyBuffer = new Uint8Array(1024 * 1024 * 14).buffer; // ~14MB mock size
-            if(key === 'spotify') currentIPA = { name: "SpotifyPlus.ipa", arrayBuffer: dummyBuffer, size: 14800000, appName: "Spotify++", bundleId: "com.spotify.client", version: "8.8.12" };
-            if(key === 'youtube') currentIPA = { name: "YouTubeCercube.ipa", arrayBuffer: dummyBuffer, size: 21500000, appName: "YouTube Cercube", bundleId: "com.google.ios.youtube", version: "18.30.2" };
+        // Genera un archivo ZIP válido en memoria para los presets para evitar errores de parseo
+        window.loadPreset = async function(key) {
+            const zip = new JSZip();
+            const appName = key === 'spotify' ? 'SpotifyPlus' : 'YouTubeCercube';
+            const bundleId = key === 'spotify' ? 'com.spotify.client' : 'com.google.ios.youtube';
+            const version = key === 'spotify' ? '8.8.12' : '18.30.2';
+
+            const payload = zip.folder("Payload").folder(appName + ".app");
+            payload.file("Info.plist", `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>${bundleId}</string>
+    <key>CFBundleName</key>
+    <string>${appName}</string>
+    <key>CFBundleDisplayName</key>
+    <string>${appName}</string>
+    <key>MinimumOSVersion</key>
+    <string>14.0</string>
+</dict>
+</plist>`);
+            payload.file("AppIcon60x60@2x.png", new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])); // dummy PNG bytes
+
+            const contentArrayBuffer = await zip.generateAsync({ type: "arraybuffer" });
+
+            currentIPA = {
+                name: appName + ".ipa",
+                arrayBuffer: contentArrayBuffer,
+                size: contentArrayBuffer.byteLength * 1200, // simular tamaño real aproximado
+                appName: appName,
+                bundleId: bundleId,
+                version: version
+            };
             updateInspectorUI();
         }
 
@@ -402,6 +436,7 @@
                     loadedZip.file(plistPath, plistData);
                 } else {
                     log("[WARN] Info.plist no encontrado en Payload/, creando perfil base...", false);
+                    loadedZip.folder("Payload").folder(newAppName + ".app").file("Info.plist", `<plist version="1.0"><dict><key>CFBundleIdentifier</key><string>${newBundleId}</string></dict></plist>`);
                 }
 
                 log("[CODESIGN] Aplicando parche de firma y re-empaquetando...");
@@ -409,7 +444,6 @@
                 progressBar.style.width = "85%";
                 progressPercent.innerText = "85%";
 
-                // Generar blob manteniendo TODOS los archivos originales y el tamaño correcto
                 const outputBlob = await loadedZip.generateAsync({
                     type: "blob",
                     compression: "DEFLATE",
@@ -434,8 +468,6 @@
                 installBtn.classList.remove('pointer-events-none', 'opacity-40', 'bg-emerald-600/50');
                 installBtn.classList.add('bg-emerald-600');
 
-                // Generar Manifiesto OTA dinámico con URL actual
-                const currentOrigin = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
                 const manifestContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -470,7 +502,6 @@
                 const manifestBlob = new Blob([manifestContent], { type: 'text/xml' });
                 manifestBlobUrl = URL.createObjectURL(manifestBlob);
 
-                // Generar Código QR OTA
                 document.getElementById('qrContainer').classList.remove('hidden');
                 const qrEl = document.getElementById('qrcode');
                 qrEl.innerHTML = '';
